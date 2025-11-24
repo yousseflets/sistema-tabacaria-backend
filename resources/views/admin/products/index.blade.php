@@ -13,6 +13,7 @@
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Preço</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -23,6 +24,7 @@
                 @foreach($products as $product)
                     <tr>
                         <td class="px-6 py-4">{{ $product->name }}</td>
+                        <td class="px-6 py-4">{{ $product->brand ? $product->brand->nome : '—' }}</td>
                         <td class="px-6 py-4">{{ $product->category ? $product->category->nome : '—' }}</td>
                         <td class="px-6 py-4">R$ {{ number_format($product->price, 2, ',', '.') }}</td>
                         <td class="px-6 py-4">{{ $product->active ? 'Ativo' : 'Inativo' }}</td>

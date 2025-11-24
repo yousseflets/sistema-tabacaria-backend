@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Brand;
 
 class ProductController extends Controller
 {
@@ -21,14 +22,15 @@ class ProductController extends Controller
 
     public function index()
     {
-        $products = Product::with('category')->orderBy('created_at', 'desc')->paginate(15);
+        $products = Product::with(['category','brand'])->orderBy('created_at', 'desc')->paginate(15);
         return view('admin.products.index', compact('products'));
     }
 
     public function create()
     {
         $categories = Category::orderBy('nome')->get();
-        return view('admin.products.create', compact('categories'));
+        $brands = Brand::orderBy('nome')->get();
+        return view('admin.products.create', compact('categories','brands'));
     }
 
     public function store(Request $request)
@@ -39,6 +41,7 @@ class ProductController extends Controller
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
+            'brand_id' => 'nullable|exists:brands,id',
         ]);
 
         $data['active'] = true;
@@ -50,7 +53,8 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::orderBy('nome')->get();
-        return view('admin.products.edit', compact('product', 'categories'));
+        $brands = Brand::orderBy('nome')->get();
+        return view('admin.products.edit', compact('product', 'categories','brands'));
     }
 
     public function update(Request $request, Product $product)
@@ -61,6 +65,7 @@ class ProductController extends Controller
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
+            'brand_id' => 'nullable|exists:brands,id',
         ]);
 
         $product->update($data);

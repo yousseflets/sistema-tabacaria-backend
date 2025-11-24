@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\BrandController;
 
 Route::prefix('admin')->group(function () {
     Route::get('login', [AuthController::class, 'showLogin'])->name('admin.login');
@@ -28,6 +29,14 @@ Route::prefix('admin')->group(function () {
     Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('admin.categories.edit');
     Route::post('categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
     Route::post('categories/{category}/delete', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+
+    // Brands
+    Route::get('brands', [BrandController::class, 'index'])->name('admin.brands.index');
+    Route::get('brands/create', [BrandController::class, 'create'])->name('admin.brands.create');
+    Route::post('brands', [BrandController::class, 'store'])->name('admin.brands.store');
+    Route::get('brands/{brand}/edit', [BrandController::class, 'edit'])->name('admin.brands.edit');
+    Route::post('brands/{brand}', [BrandController::class, 'update'])->name('admin.brands.update');
+    Route::post('brands/{brand}/delete', [BrandController::class, 'destroy'])->name('admin.brands.destroy');
 
     // Protected admin area (controllers enforce session check)
     Route::get('profile', [ProfileController::class, 'edit'])->name('admin.profile.edit');
