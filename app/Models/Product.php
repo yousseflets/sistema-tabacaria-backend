@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Category;
 
 class Product extends Model
 {
@@ -13,9 +14,14 @@ class Product extends Model
         'name',
         'sku',
         'price',
-        'quantity',
-        'category_id',
         'description',
+        'active',
+        'category_id',
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
+        'price' => 'decimal:2',
     ];
 
     public function category()

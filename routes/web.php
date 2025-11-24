@@ -1,21 +1,43 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ProductController;
 
 Route::get('/', function () {
-    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
+    return view('admin.login');
 });
+// Admin routes
+use App\Http\Controllers\Admin\AuthController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\CategoryController;
 
-// Auth routes (Breeze or other) should be required separately if installed
-if (file_exists(__DIR__.'/auth.php')) {
-    require __DIR__.'/auth.php';
-}
+Route::prefix('admin')->group(function () {
+    Route::get('login', [AuthController::class, 'showLogin'])->name('admin.login');
+    Route::post('login', [AuthController::class, 'login'])->name('admin.login.post');
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/dashboard', function () { return view('dashboard'); })->name('dashboard');
-    Route::resource('categories', CategoryController::class);
-    Route::resource('products', ProductController::class);
+    Route::post('logout', [AuthController::class, 'logout'])->name('admin.logout');
+
+    // Dashboard
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+    // Categories
+    Route::get('categories', [CategoryController::class, 'index'])->name('admin.categories.index');
+    Route::get('categories/create', [CategoryController::class, 'create'])->name('admin.categories.create');
+    Route::post('categories', [CategoryController::class, 'store'])->name('admin.categories.store');
+    Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('admin.categories.edit');
+    Route::post('categories/{category}', [CategoryController::class, 'update'])->name('admin.categories.update');
+    Route::post('categories/{category}/delete', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
+
+    // Protected admin area (controllers enforce session check)
+    Route::get('profile', [ProfileController::class, 'edit'])->name('admin.profile.edit');
+    Route::post('profile', [ProfileController::class, 'update'])->name('admin.profile.update');
+
+    // Products
+    Route::get('products', [ProductController::class, 'index'])->name('admin.products.index');
+    Route::get('products/create', [ProductController::class, 'create'])->name('admin.products.create');
+    Route::post('products', [ProductController::class, 'store'])->name('admin.products.store');
+    Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
+    Route::post('products/{product}', [ProductController::class, 'update'])->name('admin.products.update');
+    Route::post('products/{product}/toggle', [ProductController::class, 'toggle'])->name('admin.products.toggle');
 });
