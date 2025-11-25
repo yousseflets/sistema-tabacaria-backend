@@ -1,0 +1,9 @@
+/* Arquivo gerado automaticamente para evitar 404 ao carregar cores do logo */
+:root {
+  --logo-primary: #4f46e5;
+  --logo-on-primary: #ffffff;
+  --logo-accent: #ef4444;
+}
+
+/* estilos mínimos para fallback visual */
+body { --logo-primary: var(--logo-primary); }

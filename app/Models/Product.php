@@ -13,17 +13,18 @@ class Product extends Model
 
     protected $fillable = [
         'name',
-        'sku',
+        'image',
         'price',
-        'description',
+        'quantity',
         'active',
         'category_id',
         'brand_id',
     ];
 
     protected $casts = [
-        'active' => 'boolean',
+        'active' => 'integer',
         'price' => 'decimal:2',
+        'quantity' => 'integer',
     ];
 
     public function category()

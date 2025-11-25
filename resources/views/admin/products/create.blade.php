@@ -3,7 +3,7 @@
 @section('title', 'Criar Produto')
 
 @section('content')
-    <form method="POST" action="{{ route('admin.products.store') }}" class="max-w-2x2 bg-white p-6 rounded shadow">
+    <form method="POST" action="{{ route('admin.products.store') }}" class="max-w-2x2 bg-white p-6 rounded shadow" enctype="multipart/form-data">
         @csrf
         <div class="mb-4">
             <label class="block text-sm font-medium mb-1">Nome</label>
@@ -28,16 +28,16 @@
             </select>
         </div>
         <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">SKU</label>
-            <input type="text" name="sku" value="{{ old('sku') }}" class="w-full border rounded px-3 py-2" />
+            <label class="block text-sm font-medium mb-1">Imagem</label>
+            <input type="file" name="image" accept="image/*" class="w-full border rounded px-3 py-2" />
         </div>
         <div class="mb-4">
             <label class="block text-sm font-medium mb-1">Preço</label>
             <input type="text" name="price" value="{{ number_format((float) old('price', 0), 2, ',', '.') }}" required class="w-full border rounded px-3 py-2 js-currency" />
         </div>
         <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Descrição</label>
-            <textarea name="description" class="w-full border rounded px-3 py-2">{{ old('description') }}</textarea>
+            <label class="block text-sm font-medium mb-1">Quantidade</label>
+            <input type="number" name="quantity" value="{{ old('quantity', 0) }}" min="0" class="w-full border rounded px-3 py-2" />
         </div>
         <div class="flex justify-end">
             <button class="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
@@ -63,11 +63,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function toNumericValue(formatted) {
+        // Convert formatted string to numeric value robustly by extracting digits (cents)
         if (!formatted) return '0.00';
-        var cleaned = String(formatted).replace(/\./g, '').replace(',', '.');
-        cleaned = cleaned.replace(/[^0-9\.]/g, '');
-        if (cleaned === '' || cleaned === '.') return '0.00';
-        return parseFloat(cleaned).toFixed(2);
+        var digits = String(formatted).replace(/\D/g, '');
+        if (!digits) digits = '0';
+        var cents = parseInt(digits, 10);
+        if (isNaN(cents)) cents = 0;
+        var num = (cents / 100).toFixed(2);
+        return num;
     }
 
     document.querySelectorAll('.js-currency').forEach(function (el) {

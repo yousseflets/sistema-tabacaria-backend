@@ -19,6 +19,6 @@
     </div>
 
     <div class="mt-6">
-        <a href="{{ route('admin.products.index') }}" class="bg-blue-600 text-white px-4 py-2 rounded">Ir para Produtos</a>
+        <a href="{{ route('admin.products.index') }}" class="bg-green-500 text-white px-4 py-2 rounded">Ir para Produtos</a>
     </div>
 @endsection
