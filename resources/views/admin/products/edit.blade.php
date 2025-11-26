@@ -3,15 +3,15 @@
 @section('title', 'Editar Produto')
 
 @section('content')
-    <form method="POST" action="{{ route('admin.products.update', $product) }}" class="max-w-2x2 bg-white p-6 rounded shadow" enctype="multipart/form-data">
+    <form method="POST" action="{{ route('admin.products.update', $product) }}" class="max-w-3xl bg-white p-6 rounded-lg shadow" enctype="multipart/form-data">
         @csrf
         <div class="mb-4">
             <label class="block text-sm font-medium mb-1">Nome</label>
-            <input type="text" name="name" value="{{ old('name', $product->name) }}" required class="w-full border rounded px-3 py-2" />
+            <input type="text" name="name" value="{{ old('name', $product->name) }}" required class="block w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg text-sm" />
         </div>
         <div class="mb-4">
             <label class="block text-sm font-medium mb-1">Categoria</label>
-            <select name="category_id" class="w-full border rounded px-3 py-2">
+            <select name="category_id" class="block w-full p-2.5 bg-white border border-gray-300 rounded-lg text-sm">
                 <option value="">Selecione</option>
                 @foreach($categories as $cat)
                     <option value="{{ $cat->id }}" {{ (old('category_id', $product->category_id) == $cat->id) ? 'selected' : '' }}>{{ $cat->nome }}</option>
@@ -20,7 +20,7 @@
         </div>
         <div class="mb-4">
             <label class="block text-sm font-medium mb-1">Marca</label>
-            <select name="brand_id" class="w-full border rounded px-3 py-2">
+            <select name="brand_id" class="block w-full p-2.5 bg-white border border-gray-300 rounded-lg text-sm">
                 <option value="">Selecione</option>
                 @foreach($brands as $brand)
                     <option value="{{ $brand->id }}" {{ (old('brand_id', $product->brand_id) == $brand->id) ? 'selected' : '' }}>{{ $brand->nome }}</option>
@@ -34,18 +34,18 @@
                     <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-24 h-24 object-cover rounded" />
                 </div>
             @endif
-            <input type="file" name="image" accept="image/*" class="w-full border rounded px-3 py-2" />
+            <input type="file" name="image" accept="image/*" class="block w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 cursor-pointer p-1.5" />
         </div>
         <div class="mb-4">
             <label class="block text-sm font-medium mb-1">Preço</label>
-            <input type="text" name="price" value="{{ number_format((float) old('price', $product->price ?? 0), 2, ',', '.') }}" required class="w-full border rounded px-3 py-2 js-currency" />
+            <input type="text" name="price" value="{{ number_format((float) old('price', $product->price ?? 0), 2, ',', '.') }}" required class="block w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg text-sm js-currency" />
         </div>
         <div class="mb-4">
             <label class="block text-sm font-medium mb-1">Quantidade</label>
-            <input type="number" name="quantity" value="{{ old('quantity', $product->quantity ?? 0) }}" min="0" class="w-full border rounded px-3 py-2" />
+            <input type="number" name="quantity" value="{{ old('quantity', $product->quantity ?? 0) }}" min="0" class="block w-full p-2.5 bg-gray-50 border border-gray-300 rounded-lg text-sm" />
         </div>
         <div class="flex justify-end">
-            <button class="bg-green-600 text-white px-4 py-2 rounded">Atualizar</button>
+            <button class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700">Atualizar</button>
         </div>
     </form>
 @endsection

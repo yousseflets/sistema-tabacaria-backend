@@ -3,9 +3,16 @@
 @section('title', 'Marcas')
 
 @section('content')
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex items-center justify-between gap-4 mb-4">
         <h2 class="text-lg font-medium">Lista de Marcas</h2>
-        <a href="{{ route('admin.brands.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded">Nova Marca</a>
+        <div class="flex items-center gap-3">
+            <form id="brands-filter-form" method="GET" action="{{ route('admin.brands.index') }}" class="flex items-center gap-2">
+                <input type="search" name="q" value="{{ request('q') }}" placeholder="Pesquisar marcas" class="block p-2 border rounded-md text-sm" />
+                <button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded-md text-sm">Pesquisar</button>
+                <a href="{{ route('admin.brands.index') }}" class="px-3 py-2 bg-gray-100 rounded-md text-sm clear-filters">Limpar</a>
+            </form>
+            <a href="{{ route('admin.brands.create') }}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">Nova Marca</a>
+        </div>
     </div>
 
     <div class="bg-white rounded shadow overflow-hidden">
@@ -44,6 +51,32 @@
     </div>
 
     <div class="mt-4">
+        @if($brands->total() > 0)
+            <div class="text-sm text-gray-600 mb-2">Mostrando {{ $brands->firstItem() }} a {{ $brands->lastItem() }} de {{ $brands->total() }} resultados</div>
+        @else
+            <div class="text-sm text-gray-600 mb-2">Nenhum resultado encontrado</div>
+        @endif
         {{ $brands->links() }}
     </div>
+
+@section('scripts')
+<div id="loadingOverlay" class="hidden fixed inset-0 bg-white/75 z-50 flex items-center justify-center">
+    <div class="text-center">
+        <svg class="animate-spin h-10 w-10 text-gray-700 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+        <div class="mt-2 text-gray-700">Carregando...</div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    var overlay = document.getElementById('loadingOverlay');
+    var form = document.getElementById('brands-filter-form');
+    if (form) form.addEventListener('submit', function(){ if (overlay) overlay.classList.remove('hidden'); });
+    var clears = document.querySelectorAll('.clear-filters');
+    clears.forEach(function(a){ a.addEventListener('click', function(){ if (overlay) overlay.classList.remove('hidden'); }); });
+});
+</script>
+@endsection
 @endsection

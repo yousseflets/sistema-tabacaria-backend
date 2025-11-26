@@ -20,7 +20,12 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = Category::orderBy('nome')->paginate(15);
+        $query = Category::orderBy('nome');
+        $q = request('q');
+        if ($q) {
+            $query->where('nome', 'like', "%{$q}%");
+        }
+        $categories = $query->paginate(5)->appends(request()->query());
         return view('admin.categories.index', compact('categories'));
     }
 

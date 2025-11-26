@@ -51,6 +51,34 @@ class ProductsImport implements WithHeadingRow, OnEachRow, WithCustomCsvSettings
         $price = $this->ensureUtf8($data['price'] ?? $data['preco'] ?? null);
         $quantity = $this->ensureUtf8($data['quantity'] ?? $data['quantidade'] ?? null);
 
+        // FALLBACK: if header names not recognized (e.g. file without header or different headers),
+        // try to map by column position based on common layout: categoria, marca, nome, preco, quantidade
+        // only attempt when name or price are empty
+        if ((empty($name) || empty($price)) && count($data) > 0) {
+            $vals = array_values($data);
+            // typical positions: 0=categoria,1=marca,2=nome,3=preco,4=quantidade
+            if (empty($name) && isset($vals[2])) {
+                $try = $this->ensureUtf8($vals[2]);
+                if ($try) $name = $try;
+            }
+            if (empty($price) && isset($vals[3])) {
+                $try = $this->ensureUtf8($vals[3]);
+                if ($try) $price = $try;
+            }
+            if (empty($quantity) && isset($vals[4])) {
+                $try = $this->ensureUtf8($vals[4]);
+                if ($try) $quantity = $try;
+            }
+            if (empty($categoryName) && isset($vals[0])) {
+                $try = $this->ensureUtf8($vals[0]);
+                if ($try) $categoryName = $try;
+            }
+            if (empty($brandName) && isset($vals[1])) {
+                $try = $this->ensureUtf8($vals[1]);
+                if ($try) $brandName = $try;
+            }
+        }
+
         // prepare validation
         $validator = Validator::make([
             'name' => $name,

@@ -16,7 +16,6 @@ class ProductController extends Controller
 {
     public function __construct()
     {
-        // Temporariamente excetuar as rotas de import para diagnóstico (remover após teste)
         $this->middleware(function ($request, $next) {
             if (!session('admin_user_id')) {
                 return redirect()->route('admin.login');
@@ -27,8 +26,48 @@ class ProductController extends Controller
 
     public function index()
     {
-        $products = Product::with(['category','brand'])->orderBy('created_at', 'desc')->paginate(15);
-        return view('admin.products.index', compact('products'));
+        $query = Product::with(['category','brand'])->orderBy('name', 'asc');
+
+        $q = request('q');
+        $categoryId = request('category_id');
+        $brandId = request('brand_id');
+        $status = request('status'); 
+        $priceMin = request('price_min');
+        $priceMax = request('price_max');
+
+        if ($q) {
+            $query->where('name', 'like', "%{$q}%");
+        }
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+        if ($brandId) {
+            $query->where('brand_id', $brandId);
+        }
+        if ($status === 'active') {
+            $query->where('active', 1);
+        } elseif ($status === 'inactive') {
+            $query->where('active', 0);
+        }
+        if ($priceMin !== null && $priceMin !== '') {
+            $min = $this->parseLocalizedCurrency($priceMin);
+            if ($min !== null) {
+                $query->where('price', '>=', $min);
+            }
+        }
+        if ($priceMax !== null && $priceMax !== '') {
+            $max = $this->parseLocalizedCurrency($priceMax);
+            if ($max !== null) {
+                $query->where('price', '<=', $max);
+            }
+        }
+
+        $products = $query->paginate(5)->appends(request()->query());
+
+        $categories = Category::orderBy('nome')->get();
+        $brands = Brand::orderBy('nome')->get();
+
+        return view('admin.products.index', compact('products','categories','brands'));
     }
 
     public function create()
@@ -46,28 +85,19 @@ class ProductController extends Controller
 
     public function import(Request $request)
     {
-        // debug: dump request early to see if upload reached the controller
-
-            // basic logging and extension check
-            $uploaded = $request->file('file');
-            Log::info('Import upload info', [
-                'originalName' => $uploaded->getClientOriginalName(),
-                'size' => $uploaded->getSize(),
-                'mime' => $uploaded->getClientMimeType(),
-            ]);
+        $uploaded = $request->file('file');
+        Log::info('Import upload info', [
+            'originalName' => $uploaded->getClientOriginalName(),
+            'size' => $uploaded->getSize(),
+            'mime' => $uploaded->getClientMimeType(),
+        ]);
 
 
-            $ext = strtolower($uploaded->getClientOriginalExtension() ?? '');
-            if (in_array($ext, ['xlsx', 'xls']) && !class_exists(\Maatwebsite\Excel\Facades\Excel::class)) {
-                return back()->with('error', 'Arquivo Excel (.xlsx/.xls) não pode ser processado porque o pacote Maatwebsite/Excel não está instalado. Por favor envie um CSV ou instale o pacote.');
-            }
+        $ext = strtolower($uploaded->getClientOriginalExtension() ?? '');
+        if (in_array($ext, ['xlsx', 'xls']) && !class_exists(\Maatwebsite\Excel\Facades\Excel::class)) {
+            return back()->with('error', 'Arquivo Excel (.xlsx/.e o pacote Maatwebsite/Excel não está instalado. Por favor envie um CSV ou instale o pacote.');
+        }
 
-        // $request->validate([
-        //     'file' => 'required|file|mimes:xlsx,xls,csv',
-        // ]);
-
-
-        // store uploaded file temporarily
         $path = $request->file('file')->store('imports');
         $importErrors = [];
         Log::info('Import request received', ['file' => $path, 'remote_ip' => request()->ip()]);
@@ -277,5 +307,45 @@ class ProductController extends Controller
         $message = $product->active ? 'Produto ativado com sucesso.' : 'Produto desativado com sucesso.';
 
         return back()->with('success', $message);
+    }
+
+    /**
+     * Parse a localized currency string (e.g. "R$ 1.234,56" or "1.234,56" or "1234.56")
+     * and return a float value or null if it cannot be parsed.
+     *
+     * @param string|null $value
+     * @return float|null
+     */
+    private function parseLocalizedCurrency($value)
+    {
+        if ($value === null) return null;
+        $v = trim((string)$value);
+        if ($v === '') return null;
+
+        // Remove currency symbols and whitespace, keep digits, dots, commas and minus
+        $v = preg_replace('/[^0-9,\.\-]/u', '', $v);
+        if ($v === '') return null;
+
+        // If contains both '.' and ',' assume '.' = thousand sep, ',' = decimal
+        if (strpos($v, '.') !== false && strpos($v, ',') !== false) {
+            $v = str_replace('.', '', $v);
+            $v = str_replace(',', '.', $v);
+        } else {
+            // Only comma present -> decimal separator in pt-BR
+            if (strpos($v, ',') !== false) {
+                $v = str_replace(',', '.', $v);
+            }
+            // Only dots present -> assume standard decimal or no thousand sep
+        }
+
+        // Final cleanup: remove multiple dots except the last (defensive)
+        if (substr_count($v, '.') > 1) {
+            $parts = explode('.', $v);
+            $dec = array_pop($parts);
+            $v = implode('', $parts) . '.' . $dec;
+        }
+
+        $num = floatval($v);
+        return $num;
     }
 }
