@@ -246,7 +246,7 @@ class ProductController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'image' => 'nullable|image|max:2048',
+            // 'image' => 'nullable|image|max:2048'
             'price' => 'required|numeric',
             'quantity' => 'nullable|integer|min:0',
             'category_id' => 'nullable|exists:categories,id',
