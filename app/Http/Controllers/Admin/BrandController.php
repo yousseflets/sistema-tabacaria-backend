@@ -20,12 +20,21 @@ class BrandController extends Controller
 
     public function index()
     {
-        $query = Brand::orderBy('nome');
+        $query = Brand::orderBy('active', 'desc')->orderBy('nome');
+
         $q = request('q');
         if ($q) {
             $query->where('nome', 'like', "%{$q}%");
         }
-        $brands = $query->paginate(5)->appends(request()->query());
+
+        $status = request('status');
+        if ($status === 'active') {
+            $query->where('active', 1);
+        } elseif ($status === 'inactive') {
+            $query->where('active', 0);
+        }
+
+        $brands = $query->paginate(10)->appends(request()->query());
         return view('admin.brands.index', compact('brands'));
     }
 
@@ -65,5 +74,14 @@ class BrandController extends Controller
     {
         $brand->delete();
         return back()->with('success', 'Marca excluída.');
+    }
+
+    public function toggle(Brand $brand)
+    {
+        $brand->active = $brand->active ? 0 : 1;
+        $brand->save();
+
+        $message = $brand->active ? 'Marca ativada com sucesso.' : 'Marca desativada com sucesso.';
+        return back()->with('success', $message);
     }
 }

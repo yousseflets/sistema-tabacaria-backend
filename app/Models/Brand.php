@@ -12,6 +12,11 @@ class Brand extends Model
     protected $fillable = [
         'nome',
         'descricao',
+        'active',
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
     ];
 
     public function products()

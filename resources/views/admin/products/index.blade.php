@@ -43,7 +43,7 @@
                 <label class="block text-xs text-gray-500 mb-1">Marca</label>
                 <select name="brand_id" class="block w-full p-2 border rounded-md text-sm">
                     <option value="">Todas</option>
-                    @foreach($brands as $b)
+                    @foreach($brands->where('active', 1) as $b)
                         <option value="{{ $b->id }}" {{ request('brand_id') == $b->id ? 'selected' : '' }}>{{ $b->nome }}</option>
                     @endforeach
                 </select>

@@ -42,7 +42,7 @@ class ProductController extends Controller
             $query->where('category_id', $categoryId);
         }
         if ($brandId) {
-            $query->where('brand_id', $brandId);
+            $query->where('brand_id', $brandId)->where('active', 1);
         }
         if ($status === 'active') {
             $query->where('active', 1);

@@ -38,6 +38,7 @@ Route::prefix('admin')->group(function () {
     Route::get('brands/{brand}/edit', [BrandController::class, 'edit'])->name('admin.brands.edit');
     Route::post('brands/{brand}', [BrandController::class, 'update'])->name('admin.brands.update');
     Route::post('brands/{brand}/delete', [BrandController::class, 'destroy'])->name('admin.brands.destroy');
+    Route::post('brands/{brand}/toggle', [BrandController::class, 'toggle'])->name('admin.brands.toggle');
 
     // Protected admin area (controllers enforce session check)
     Route::get('profile', [ProfileController::class, 'edit'])->name('admin.profile.edit');
