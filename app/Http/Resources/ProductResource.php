@@ -34,7 +34,9 @@ class ProductResource extends JsonResource
             }),
             'image' => $this->image ?? null,
             'image_url' => $this->when($this->image, function () {
-                return asset('storage/images/products/' . $this->image);
+                // $this->image may already include the "images/products/..." prefix because we store with
+                // $request->file('image')->store('images/products', 'public') — so return asset('storage/' . $this->image)
+                return asset('storage/' . ltrim($this->image, '/'));
             }),
             'created_at' => $this->created_at?->toDateTimeString(),
             'updated_at' => $this->updated_at?->toDateTimeString(),
