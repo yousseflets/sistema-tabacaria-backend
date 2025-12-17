@@ -133,6 +133,13 @@
 <!-- Chart.js for charts on dashboard -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+</div>
+<footer class="bg-white border-t mt-6">
+    <div class="max-w-7xl mx-auto py-4 px-6 text-sm text-gray-500 text-center">
+        © {{ date('Y') }} SolutionWebTI — Todos os direitos reservados
+    </div>
+</footer>
+
 @yield('scripts')
 </body>
 </html>
